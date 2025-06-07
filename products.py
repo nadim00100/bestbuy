@@ -1,64 +1,49 @@
 class Product:
-    """
-    A class to represent a product with a name, price, and quantity in stock.
+    def __init__(self, name: str, price: float, quantity: int):
+        if not name:
+            raise ValueError("Product name cannot be empty.")
+        if price < 0:
+            raise ValueError("Price cannot be negative.")
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
 
-    Attributes:
-        name (str): The name of the product.
-        price (float): The price of the product.
-        quantity (int): The number of units of the product available in stock.
-    """
-
-    def __init__(self, name, price, quantity):
-        """
-        Initializes a new product with the given name, price, and quantity.
-
-        Args:
-            name (str): The name of the product.
-            price (float): The price of the product.
-            quantity (int): The number of units of the product in stock.
-        """
         self.name = name
         self.price = price
         self.quantity = quantity
+        self.active = True  # Set active by default
 
-    def buy(self, amount):
-        """
-        Buy a specified amount of the product and reduce the stock.
+    def get_quantity(self) -> int:
+        return self.quantity
 
-        Args:
-            amount (int): The number of units to buy.
+    def set_quantity(self, quantity: int):
+        if quantity < 0:
+            raise ValueError("Quantity cannot be negative.")
+        self.quantity = quantity
+        if quantity == 0:
+            self.deactivate()
 
-        Returns:
-            float: The total cost of the units bought.
+    def is_active(self) -> bool:
+        return self.active
 
-        Raises:
-            ValueError: If the amount requested is more than the available stock.
-        """
-        if amount > self.quantity:
-            raise ValueError("Not enough in stock.")
-        self.quantity -= amount
-        return self.price * amount
+    def activate(self):
+        self.active = True
 
-    def is_active(self):
-        """
-        Check if the product is still active (i.e., if there is any stock left).
+    def deactivate(self):
+        self.active = False
 
-        Returns:
-            bool: True if the product has stock available, False otherwise.
-        """
-        return self.quantity > 0
+    def show(self) -> str:
+        return f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}"
 
-    def show(self):
-        """
-        Print the details of the product: its name, price, and remaining quantity.
-        """
-        print(f"{self.name}, Price: ${self.price}, Quantity: {self.quantity}")
+    def buy(self, quantity: int) -> float:
+        if not self.active:
+            raise Exception("Cannot buy an inactive product.")
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than zero.")
+        if quantity > self.quantity:
+            raise ValueError("Not enough stock to complete the purchase.")
 
-    def set_quantity(self, new_quantity):
-        """
-        Set the quantity of the product to a new value.
+        self.quantity -= quantity
+        if self.quantity == 0:
+            self.deactivate()
 
-        Args:
-            new_quantity (int): The new quantity of the product.
-        """
-        self.quantity = new_quantity
+        return self.price * quantity
